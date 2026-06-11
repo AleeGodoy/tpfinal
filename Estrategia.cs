@@ -16,7 +16,36 @@ namespace tpfinal
         public String Consulta1(List<string> datos)
         {
 
-            string result = "Implementar";
+                List<Dato> listaHeap = new List<Dato>();
+                List<Dato> listaOrden = new List<Dato>();
+
+                Stopwatch reloj = new Stopwatch();
+
+                // Tiempo Heap
+                reloj.Start();
+
+                BuscarConHeap(datos, 5, listaHeap);
+
+                reloj.Stop();
+
+                long tiempoHeap = reloj.ElapsedMilliseconds;
+
+                // Reiniciar reloj
+                reloj.Reset();
+
+                // Tiempo Ordenamiento
+                reloj.Start();
+
+                BuscarConOtro(datos, 5, listaOrden);
+
+                reloj.Stop();
+
+                long tiempoOrden = reloj.ElapsedMilliseconds;
+
+            string result = "TIEMPOS DE BUSQUEDA DE LOS 5 ELEMENTOS CON MAYOR CANTIDAD DE OCURRENCIAS\n\n";
+
+            result += "Tiempo utilizando Heap: " + tiempoHeap + " ms\n";
+            result += "Tiempo utilizando Ordenamiento: " + tiempoOrden + " ms";
 
             return result;
         }
@@ -24,17 +53,65 @@ namespace tpfinal
 
         public String Consulta2(List<string> datos)
         {
+            List<Dato> lista = ContarOcurrencias(datos);
 
-            string result = "Implementar";
+            ConstruirHeap(lista);
 
-            return result;
+            string resultado = "Camino a la hoja izquierda de la Heap:\n\n";
+
+            int actual = 0;
+
+            while (actual < lista.Count)
+            {
+                resultado += lista[actual].texto +
+                             " (Ocurrencia:" +
+                             lista[actual].ocurrencia +
+                             ")\n";
+
+                actual = 2 * actual + 1;
+            }
+
+            return resultado;
         }
 
 
 
         public String Consulta3(List<string> datos)
         {
-            string result = "Implementar";
+            List<Dato> lista = ContarOcurrencias(datos);
+
+            ConstruirHeap(lista);
+
+            string result = "NODOS DE LA HEAP POR NIVEL:\n\n";
+
+            int nivel = 0;
+            int i = 0;
+            int elementosNivel = 1;
+
+            while (i < lista.Count)
+            {
+                result += "Nivel " + nivel + "\n";
+
+                int fin = i + elementosNivel;
+
+                if (fin > lista.Count)
+                {
+                    fin = lista.Count;
+                }
+
+                for (int j = i; j < fin; j++)
+                {
+                    result += "-" + lista[j].texto +
+                              " (Ocurrencias:" +
+                              lista[j].ocurrencia + ")\n";
+                }
+
+                result += "\n";
+
+                i = fin;
+                nivel++;
+                elementosNivel = elementosNivel * 2;
+            }
 
             return result;
         }
@@ -84,7 +161,7 @@ namespace tpfinal
 
                 tamaño--;
 
-                Heapify(lista, tamaño, 0);
+                ReordenarHeap(lista, tamaño, 0);
             }
         }
 
@@ -114,7 +191,7 @@ namespace tpfinal
             return lista;
         }
 
-        private void Heapify(List<Dato> lista, int n, int i)
+        private void ReordenarHeap(List<Dato> lista, int n, int i)
         {
             int mayor = i;
 
@@ -137,14 +214,14 @@ namespace tpfinal
                 lista[i] = lista[mayor];
                 lista[mayor] = aux;
 
-                Heapify(lista, n, mayor);
+                ReordenarHeap(lista, n, mayor);
             }
         }
         private void ConstruirHeap(List<Dato> lista)
         {
             for (int i = lista.Count / 2 - 1; i >= 0; i--)
             {
-                Heapify(lista, lista.Count, i);
+                ReordenarHeap(lista, lista.Count, i);
             }
         }
     }
